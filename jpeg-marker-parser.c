@@ -95,11 +95,31 @@ int main(int argc, char *argv[])
 
       if( *cursor != 0xFF ) {
          printf("Not a valid marker\n");
+         printf("There are %d bytes unaccounted for\n", (endOfBuf - cursor));
          exit(EXIT_FAILURE);
       }
-
-      cursor += 2;
       
+      // if this is the start-of-stream marker 0xFF 0xDA
+      // just move forward until we find the next marker
+      // every FF in the stream should have a null
+      if( *(cursor+1) == 0xDA) {
+         printf("Start of stream, scanning for next marker\n");
+         cursor += 2;
+         
+         while ( (cursor+1) <= endOfBuf ) {
+            if( *cursor == 0xFF && *(cursor+1) != 0x00 ) {
+               printf("File position: 0x%x\n", (cursor - begOfBuf));
+               printf("Next marker: 0x%x 0x%x\n", *cursor, *(cursor+1));
+               break;
+            }
+            else {
+               cursor++;
+            }
+         }
+      }
+      
+      cursor +=2;
+
       // Get it's length
       if( cursor+2 > endOfBuf) {
          printf("\nEND OF FILE 0x%x\n", (cursor - begOfBuf));
