@@ -126,8 +126,6 @@ int main(int argc, char *argv[])
          exit(EXIT_FAILURE);
       }
       markerLen = READ_BIG_16(cursor);
-      //markerLen = *cursor << 8;
-      //markerLen = *(cursor+1);
       printf("markerLen: 0x%x\n", markerLen);
       cursor += markerLen;  
    }
