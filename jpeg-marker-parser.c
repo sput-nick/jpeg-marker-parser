@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
    }
 
    // Check the file magic
-   // 0xff 0xd8 is expected
+   // 0xFF 0xD8 is expected
    printf("\nFirst byte: 0x%x\n", *begOfBuf);
    printf("Second byte: 0x%x\n", *(begOfBuf+1));
 
@@ -59,4 +59,23 @@ int main(int argc, char *argv[])
       free(begOfBuf);
       exit(EXIT_FAILURE);
    }
+
+   // check for EOF marker
+   // 0xFF 0xD9 is expected
+   
+   printf("End of file: 0x%x 0x%x\n", *(endOfBuf-2), *(endOfBuf-1));
+
+   if( ( *(endOfBuf-2) != 0xFF ) || ( *(endOfBuf-1) != 0xD9 ) ) {
+      printf("EOF marker is incorrect, attempting to parse\n");
+   }
+
+   // set the cursor to the location of the next tag
+   if( begOfBuf+3 > endOfBuf) {
+      printf("\nEND OF FILE\n");
+      exit(EXIT_FAILURE);
+   }
+
+   // read the remaining tags, printing the tag and length
+   //while( cursor <= endOfBuf ) {
+   //}
 }
