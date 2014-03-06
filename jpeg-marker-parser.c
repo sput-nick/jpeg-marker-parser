@@ -5,10 +5,15 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#ifndef READ_BIG_16
+#define READ_BIG_16(p) (*(p) << 8) \
+                     | (*((u_int8_t *)(p) + 1))
+#endif
+
 int main(int argc, char *argv[])
 {
    FILE *fp;              // jpeg file
-   uint16_t markerLength; // length of marker
+   uint16_t markerLen; // length of marker
    uint8_t *begOfBuf;     // beginning of file
    uint8_t *endOfBuf;     // end of file
    uint8_t *cursor;       // location in file
@@ -74,8 +79,37 @@ int main(int argc, char *argv[])
       printf("\nEND OF FILE\n");
       exit(EXIT_FAILURE);
    }
+   cursor = begOfBuf+2;
 
    // read the remaining tags, printing the tag and length
-   //while( cursor <= endOfBuf ) {
-   //}
+   while( cursor <= endOfBuf ) {
+      // Make sure there is data
+      if( cursor+2 > endOfBuf) {
+         printf("\nEND OF FILE 0x%x\n", (cursor - begOfBuf));
+         exit(EXIT_FAILURE);
+      }
+
+      // Get the next marker
+      printf("File position: 0x%x\n", (cursor - begOfBuf));
+      printf("Next marker: 0x%x 0x%x\n", *cursor, *(cursor+1));
+
+      if( *cursor != 0xFF ) {
+         printf("Not a valid marker\n");
+         exit(EXIT_FAILURE);
+      }
+
+      cursor += 2;
+      
+      // Get it's length
+      if( cursor+2 > endOfBuf) {
+         printf("\nEND OF FILE 0x%x\n", (cursor - begOfBuf));
+         exit(EXIT_FAILURE);
+      }
+      markerLen = READ_BIG_16(cursor);
+      //markerLen = *cursor << 8;
+      //markerLen = *(cursor+1);
+      printf("markerLen: 0x%x\n", markerLen);
+      cursor += markerLen;  
+   }
 }
+
