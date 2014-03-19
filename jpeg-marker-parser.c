@@ -1,5 +1,6 @@
 // jpeg marker parser
 // get some basic info from a jpeg, not the exif data
+// doesn't really parse accurately
 
 #include <stdio.h>
 #include <stdlib.h>
